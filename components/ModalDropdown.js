@@ -31,6 +31,7 @@ export default class ModalDropdown extends Component {
     options: PropTypes.array.isRequired,
     accessible: PropTypes.bool,
     animated: PropTypes.bool,
+    mapOnly: PropTypes.bool,
     showsVerticalScrollIndicator: PropTypes.bool,
     keyboardShouldPersistTaps: PropTypes.string,
     style: PropTypes.oneOfType([
@@ -62,6 +63,7 @@ export default class ModalDropdown extends Component {
     renderRow: PropTypes.func,
     renderSeparator: PropTypes.func,
     renderButtonText: PropTypes.func,
+    renderMapView: PropTypes.func,
     onDropdownWillShow: PropTypes.func,
     onDropdownWillHide: PropTypes.func,
     onSelect: PropTypes.func,
@@ -75,6 +77,7 @@ export default class ModalDropdown extends Component {
     defaultValue: 'Please select...',
     options: null,
     animated: true,
+    mapOnly: false,
     showsVerticalScrollIndicator: true,
     keyboardShouldPersistTaps: 'never',
   };
@@ -179,7 +182,7 @@ export default class ModalDropdown extends Component {
   }
 
   _renderButton() {
-    const { disabled, accessible, children, textStyle } = this.props;
+    const { disabled, accessible, children, textStyle, mapOnly } = this.props;
     const { buttonText } = this.state;
 
     return (
@@ -196,7 +199,7 @@ export default class ModalDropdown extends Component {
             </Text>
           </View>
         )}
-      </TouchableOpacity>
+      </TouchableOpacity>      
     );
   }
 
@@ -209,8 +212,8 @@ export default class ModalDropdown extends Component {
   };
 
   _renderModal() {
-    const { animated, accessible, dropdownStyle } = this.props;
-    const { showDropdown, loading } = this.state;
+    const { disabled, animated, accessible, dropdownStyle, mapOnly, renderMapView } = this.props;
+    const { showDropdown, loading, buttonText } = this.state;
 
     if (showDropdown && this._buttonFrame) {
       const frameStyle = this._calcPosition();
@@ -230,6 +233,16 @@ export default class ModalDropdown extends Component {
             'landscape-right',
           ]}
         >
+          {mapOnly && 
+            <TouchableWithoutFeedback
+              ref={button => (this._button = button)}
+              disabled={disabled}
+              accessible={accessible}
+              onPress={this._onRequestClose}
+            >
+              {renderMapView() || <React.Fragment />}
+            </TouchableWithoutFeedback>
+          }
           <TouchableWithoutFeedback
             accessible={accessible}
             disabled={!showDropdown}
@@ -428,13 +441,14 @@ export default class ModalDropdown extends Component {
 
 const styles = StyleSheet.create({
   button: {
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   buttonText: {
     fontSize: 12,
   },
   modal: {
     flexGrow: 1,
+    zIndex: -999
   },
   dropdown: {
     position: 'absolute',
