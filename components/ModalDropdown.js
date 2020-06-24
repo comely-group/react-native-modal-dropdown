@@ -233,16 +233,7 @@ export default class ModalDropdown extends Component {
             'landscape-right',
           ]}
         >
-          {mapOnly && 
-            <TouchableWithoutFeedback
-              ref={button => (this._button = button)}
-              disabled={disabled}
-              accessible={accessible}
-              onPress={this._onRequestClose}
-            >
-              {renderMapView() || <React.Fragment />}
-            </TouchableWithoutFeedback>
-          }
+          {mapOnly && (renderMapView() || <React.Fragment />)}
           <TouchableWithoutFeedback
             accessible={accessible}
             disabled={!showDropdown}
